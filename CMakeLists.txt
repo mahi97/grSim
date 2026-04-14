@@ -123,6 +123,9 @@ if(NOT VARTYPES_FOUND)
   if(CMAKE_MAKE_PROGRAM)
     list(APPEND VARTYPES_CMAKE_ARGS "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}")
   endif()
+  if(CMAKE_PREFIX_PATH)
+    list(APPEND VARTYPES_CMAKE_ARGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
+  endif()
 
   ExternalProject_Add(vartypes_external
     GIT_REPOSITORY    https://github.com/jpfeltracco/vartypes
