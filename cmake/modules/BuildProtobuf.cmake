@@ -40,8 +40,13 @@ ExternalProject_Add(protobuf_external
   STEP_TARGETS install
 )
 
-set(PROTOBUF_SUBPATH "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}protobuf${CMAKE_STATIC_LIBRARY_SUFFIX}")
-set(LIBPROTOC_SUBPATH "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}protoc${CMAKE_STATIC_LIBRARY_SUFFIX}")
+# protobuf's CMake targets are named "libprotobuf" and "libprotoc", so the
+# installed filenames are "libprotobuf.a" / "libprotoc.a" on Unix and
+# "libprotobuf.lib" / "libprotoc.lib" on MSVC.  Using the target-name prefix
+# ("lib") directly instead of CMAKE_STATIC_LIBRARY_PREFIX keeps the paths
+# correct on every platform.
+set(PROTOBUF_SUBPATH "${CMAKE_INSTALL_LIBDIR}/libprotobuf${CMAKE_STATIC_LIBRARY_SUFFIX}")
+set(LIBPROTOC_SUBPATH "${CMAKE_INSTALL_LIBDIR}/libprotoc${CMAKE_STATIC_LIBRARY_SUFFIX}")
 set(PROTOC_SUBPATH "bin/protoc${CMAKE_EXECUTABLE_SUFFIX}")
 
 # the byproducts are available after the install step

@@ -46,8 +46,6 @@ jobs:
   build-windows:
     runs-on: windows-latest
     continue-on-error: true
-    env:
-      VCPKG_DEFAULT_TRIPLET: x64-windows
     steps:
       - uses: actions/checkout@v6
 
@@ -58,16 +56,15 @@ jobs:
         with:
           arch: x64
 
-      - name: Install dependencies via vcpkg
-        uses: lukka/run-vcpkg@v11
+      - name: Install Qt5
+        uses: jurplel/install-qt-action@v4
         with:
-          vcpkgGitCommitId: 'c3867e714dd3a51c272826eea77267876517ed99'
-          vcpkgDirectory: 'c:/vcpkg'
+          version: '5.15.2'
+          arch: 'win64_msvc2019_64'
+          cache: true
 
-      - name: Configure and Build with CMake
-        uses: lukka/run-cmake@v10
-        with:
-          configurePreset: 'ninja-multi-vcpkg'
-          configurePresetAdditionalArgs: "['-DVCPKG_TARGET_TRIPLET=x64-windows']"
-          buildPreset: 'ninja-multi-vcpkg'
-          buildPresetAdditionalArgs: "['--config Release']"
+      - name: Configure
+        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_ODE=ON
+
+      - name: Build
+        run: cmake --build build --config Release
