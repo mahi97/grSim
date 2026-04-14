@@ -4,6 +4,8 @@ on:
     branches:
       - master
   pull_request:
+permissions:
+  contents: read
 jobs:
   build-linux:
     runs-on: ${{ matrix.os }}
@@ -41,28 +43,26 @@ jobs:
           export CMAKE_PREFIX_PATH="/opt/homebrew/opt/qt@5"
           make
 
-# Windows build does not work currently, see https://github.com/RoboCup-SSL/grSim/issues/183
-#  build-windows:
-#    runs-on: windows-latest
-#    steps:
-#      - uses: actions/checkout@v4
-#
-#      - name: Install dependencies # saves / restores cache to avoid rebuilding dependencies
-#        uses: lukka/run-vcpkg@v11
-#        with:
-#          vcpkgGitCommitId: 8eb57355a4ffb410a2e94c07b4dca2dffbee8e50
-#          vcpkgDirectory: c:/vcpkg  # folder must reside in c:\ otherwise qt wont install due to long path errors
-#
-#      - name: Run CMake and run vcpkg to build packages
-#        uses: lukka/run-cmake@v10
-#        with:
-#          # this preset is needed to actually install the vcpkg dependencies
-#          configurePreset: "ninja-multi-vcpkg"
-#          configPresetAdditionalArgs: "[-DVCPKG_TARGET_TRIPLET=x64-windows]"
-#          buildPreset: "ninja-multi-vcpkg"
-#          buildPresetAdditionalArgs: "['--config Release']"
-#    env:
-#      # [OPTIONAL] Define the vcpkg's triplet you want to enforce, otherwise the default one
-#      # for the hosting system will be automatically choosen (x64 is the default on all
-#      # platforms, e.g. `x64-osx`).
-#      VCPKG_DEFAULT_TRIPLET: "x64-windows"
+  build-windows:
+    runs-on: windows-latest
+    continue-on-error: true
+    env:
+      VCPKG_DEFAULT_TRIPLET: x64-windows
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: lukka/get-cmake@latest
+
+      - name: Install dependencies via vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
+          vcpkgDirectory: 'c:/vcpkg'
+
+      - name: Configure and Build with CMake
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'ninja-multi-vcpkg'
+          configurePresetAdditionalArgs: "['-DVCPKG_TARGET_TRIPLET=x64-windows']"
+          buildPreset: 'ninja-multi-vcpkg'
+          buildPresetAdditionalArgs: "['--config Release']"
