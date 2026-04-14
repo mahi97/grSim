@@ -27,7 +27,7 @@ RUN git clone https://github.com/jpfeltracco/vartypes.git . && \
     sed -i 's/l->setMargin(1);/l->setContentsMargins(1, 1, 1, 1);/' vartypes/gui/VarTreeView.cpp && \
     mkdir build && \
     cd build && \
-    cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 .. && \
+    cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DVARTYPES_BUILD_STATIC=ON -DCMAKE_INSTALL_DOCDIR=share/doc .. && \
     make && \
     make install
 
