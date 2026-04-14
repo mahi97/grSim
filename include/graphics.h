@@ -22,8 +22,16 @@ Copyright (C) 2011, Parsian Robotic Center (eew.aut.ac.ir/~parsian/grsim)
 #define GL_SILENCE_DEPRECATION
 #include <ode/ode.h>
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
+
 #include <QVector>
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QString>
 
 enum CameraMotionMode {
@@ -39,7 +47,7 @@ private:
     QVector<GLuint> tex_ids;
     dReal frustum_right,frustum_bottom,frustum_vnear,m_renderDepth;
     int _width,_height;
-    QGLWidget* owner;
+    QOpenGLWidget* owner;
     int sphere_quality;
     void _drawBox (const dReal sides[3]);
     void _drawPatch (dReal p1[3], dReal p2[3], dReal p3[3], int level);
@@ -51,7 +59,7 @@ private:
     void setCamera (dReal x, dReal y, dReal z, dReal h, dReal p, dReal r);
     bool graphicDisabled;
 public:
-    CGraphics(QGLWidget* _owner);
+    CGraphics(QOpenGLWidget* _owner);
     ~CGraphics();
     void disableGraphics();
     void enableGraphics();

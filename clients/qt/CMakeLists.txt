@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_AUTOMOC ON)
 
@@ -17,8 +17,8 @@ endif()
 
 set(libs)
 
-find_package(Qt5 COMPONENTS Core Widgets Network REQUIRED)
-list(APPEND libs Qt5::Core Qt5::Widgets Qt5::Network)
+find_package(Qt6 COMPONENTS Core Widgets Network REQUIRED)
+list(APPEND libs Qt6::Core Qt6::Widgets Qt6::Network)
 
 # if find_package was already executed and we already included BuildProtobuf find_package fails,
 # so we only want to do execute find_package if protobuf was not found yet

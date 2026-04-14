@@ -20,7 +20,7 @@ Copyright (C) 2011, Parsian Robotic Center (eew.aut.ac.ir/~parsian/grsim)
 #define SSLWORLD_H
 
 
-#include <QGLWidget>
+#include <QOpenGLWidget>
 #include <QObject>
 #include <QUdpSocket>
 #include <QList>
@@ -61,7 +61,7 @@ class SSLWorld : public QObject
 {
     Q_OBJECT
 private:
-    QGLWidget* m_parent;
+    QOpenGLWidget* m_parent;
     int frame_num;
     dReal last_dt;
     dReal sim_time = 0;
@@ -80,7 +80,7 @@ private:
 public:    
     dReal customDT;
     bool isGLEnabled;
-    SSLWorld(QGLWidget* parent, ConfigWidget* _cfg, RobotsFormation *form1, RobotsFormation *form2);
+    SSLWorld(QOpenGLWidget* parent, ConfigWidget* _cfg, RobotsFormation *form1, RobotsFormation *form2);
     ~SSLWorld() override;
     void glinit();
     void step(dReal dt=-1);

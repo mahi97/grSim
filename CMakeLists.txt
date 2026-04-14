@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 
 
 ## Project branding, version and package mantainer
@@ -51,7 +51,8 @@ if(UNIX)
 endif()
 
 # set explicitly the c++ standard to use
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # add src dir to included directories
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -72,14 +73,8 @@ list(APPEND libs ${OPENGL_LIBRARIES})
 #include_directories(${GLUT_INCLUDE_DIR})
 
 # Qt
-if(APPLE AND EXISTS /usr/local/opt/qt)
-  # Homebrew installs Qt5 (up to at least 5.9.1) in
-  # /usr/local/qt5, ensure it can be found by CMake since
-  # it is not in the default /usr/local prefix.
-  list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt")
-endif()
-find_package(Qt5 COMPONENTS Core Widgets OpenGL Network REQUIRED)
-list(APPEND libs Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Network)
+find_package(Qt6 COMPONENTS Core Widgets OpenGLWidgets Network REQUIRED)
+list(APPEND libs Qt6::Core Qt6::Widgets Qt6::OpenGLWidgets Qt6::Network)
 
 # ODE
 if(BUILD_ODE)
@@ -109,7 +104,7 @@ find_package(VarTypes)
 if(NOT VARTYPES_FOUND)
   include(ExternalProject)
   
-  set(VARTYPES_CMAKE_ARGS "-DVARTYPES_BUILD_STATIC=ON;-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>;-DCMAKE_POLICY_VERSION_MINIMUM=3.5")
+  set(VARTYPES_CMAKE_ARGS "-DVARTYPES_BUILD_STATIC=ON;-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>;-DCMAKE_POLICY_VERSION_MINIMUM=3.5;-DVARTYPES_USE_QT6=ON")
   if(NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
     set(VARTYPES_CMAKE_ARGS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE};${VARTYPES_CMAKE_ARGS}")
   endif()
@@ -117,6 +112,7 @@ if(NOT VARTYPES_FOUND)
   ExternalProject_Add(vartypes_external
     GIT_REPOSITORY    https://github.com/jpfeltracco/vartypes
     GIT_TAG           origin/jpfeltracco/build_static
+    PATCH_COMMAND     ${CMAKE_COMMAND} -DFILE=<SOURCE_DIR>/CMakeLists.txt -P ${PROJECT_SOURCE_DIR}/cmake/modules/PatchVartypesQt6.cmake
     CMAKE_ARGS        "${VARTYPES_CMAKE_ARGS}"
     STEP_TARGETS install
   )
@@ -169,7 +165,7 @@ protobuf_generate_cpp(PROTO_CPP PROTO_H
     src/proto/ssl_vision_wrapper.proto
 )
 
-qt5_add_resources(RESOURCES
+qt_add_resources(RESOURCES
     resources/textures.qrc
 )
 
