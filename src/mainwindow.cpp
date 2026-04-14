@@ -134,7 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
     fileMenu->addAction(takeSnapshotToClipboardAct);
     fileMenu->addAction(exit);
 
-    QObject::connect(new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this),
+    QObject::connect(new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q), this),
                      &QShortcut::activated,
                      this,
                      &MainWindow::close);
@@ -368,7 +368,7 @@ void MainWindow::update()
 {
     if (glwidget->ssl->isGLEnabled) {
         glwidget->ssl->g->enableGraphics();
-        glwidget->updateGL();
+        glwidget->update();
     } else {
         glwidget->ssl->g->disableGraphics();
         glwidget->step();
@@ -547,13 +547,13 @@ void MainWindow::setCurrentRobotPosition()
 
 void MainWindow::takeSnapshot()
 {
-    QPixmap p(glwidget->renderPixmap(glwidget->size().width(),glwidget->size().height(),false));
+    QPixmap p(glwidget->grab());
     p.save(QFileDialog::getSaveFileName(this, tr("Save Snapshot"), current_dir, tr("Images (*.png)")),"PNG",100);
 }
 
 void MainWindow::takeSnapshotToClipboard()
 {
-    QPixmap p(glwidget->renderPixmap(glwidget->size().width(),glwidget->size().height(),false));
+    QPixmap p(glwidget->grab());
     QClipboard* b = QApplication::clipboard();
     b->setPixmap(p);
 }

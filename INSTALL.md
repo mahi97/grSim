@@ -10,10 +10,10 @@ GrSim is written in C++, in order to compile it, you will need a working toolcha
 
 GrSim depends on:
 
-- [CMake](https://cmake.org/) version 3.5+
+- [CMake](https://cmake.org/) version 3.16+
 - [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/)
 - [OpenGL](https://www.opengl.org)
-- [Qt5 Development Libraries](https://www.qt.io)
+- [Qt6 Development Libraries](https://www.qt.io)
 - [Open Dynamics Engine (ODE)](http://www.ode.org)
 - [VarTypes Library](https://github.com/jpfeltracco/vartypes) forked from [Szi's Vartypes](https://github.com/szi/vartypes)
 - [Google Protobuf](https://github.com/google/protobuf)
@@ -53,15 +53,15 @@ The container can be run in two flavors:
 If you are running Arch Linux or an Arch Linux based distribution, install the dependencies with:
 ```
 $ sudo pacman -S base-devel boost hicolor-icon-theme \
-                 mesa ode protobuf qt5-base cmake git
+                 mesa ode protobuf qt6-base cmake git
 ```
 
 #### Ubuntu / Debian
 
 For Debian, or derivative
 ```
-sudo apt install git build-essential cmake pkg-config qtbase5-dev \
-                   libqt5opengl5-dev libgl1-mesa-dev libglu1-mesa-dev \
+sudo apt install git build-essential cmake pkg-config qt6-base-dev \
+                   libqt6opengl6-dev libgl1-mesa-dev libglu1-mesa-dev \
                    libprotobuf-dev protobuf-compiler libode-dev libboost-dev
 ```
 
@@ -79,7 +79,7 @@ brew install cmake
 brew install pkg-config
 brew tap robotology/formulae         
 brew install robotology/formulae/ode
-brew install qt@5
+brew install qt@6
 brew install protobuf@21
 ```
 
@@ -101,7 +101,7 @@ For Windows, you will need to have installed:
 To install the dependencies, open a terminal in vcpkg installation folder and run the following command (it will take very long to run):
 
 ```bash
-$ ./vcpkg install qt5:x64-windows ode:x64-windows protobuf:x64-windows
+$ ./vcpkg install qtbase:x64-windows ode:x64-windows protobuf:x64-windows
 ```
 
 ### Building

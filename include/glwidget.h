@@ -20,15 +20,15 @@ Copyright (C) 2011, Parsian Robotic Center (eew.aut.ac.ir/~parsian/grsim)
 #define GLWIDGET_H
 
 #define GL_SILENCE_DEPRECATION
-#include <QGLWidget>
-#include <QTime>
+#include <QOpenGLWidget>
+#include <QElapsedTimer>
 #include <QMenu>
 
 #include "sslworld.h"
 #include "configwidget.h"
 
 
-class GLWidget : public QGLWidget {
+class GLWidget : public QOpenGLWidget {
 
     Q_OBJECT
 public:
@@ -114,7 +114,7 @@ private:
     int moving_robot_id,clicked_robot;
     int frames;
     bool first_time;
-    QTime time,rendertimer;
+    QElapsedTimer time,rendertimer;
     dReal m_fps;
     QPoint lastPos;
 };
