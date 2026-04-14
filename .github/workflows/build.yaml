@@ -56,15 +56,21 @@ jobs:
         with:
           arch: x64
 
-      - name: Install Qt5
-        uses: jurplel/install-qt-action@v4
+      - name: Cache Qt5
+        id: cache-qt
+        uses: actions/cache@v4
         with:
-          version: '5.15.2'
-          arch: 'win64_msvc2019_64'
-          cache: true
+          path: C:/Qt
+          key: qt-5.15.2-win64-msvc2019-64
+
+      - name: Install Qt5 via aqtinstall
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        run: |
+          pip install aqtinstall
+          python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 --outputdir C:/Qt
 
       - name: Configure
-        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_ODE=ON
+        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_ODE=ON "-DCMAKE_PREFIX_PATH=C:/Qt/5.15.2/msvc2019_64"
 
       - name: Build
         run: cmake --build build --config Release
