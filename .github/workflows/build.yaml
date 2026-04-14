@@ -4,6 +4,8 @@ on:
     branches:
       - master
   pull_request:
+permissions:
+  contents: read
 jobs:
   build-linux:
     runs-on: ${{ matrix.os }}
@@ -41,28 +43,34 @@ jobs:
           export CMAKE_PREFIX_PATH="/opt/homebrew/opt/qt@5"
           make
 
-# Windows build does not work currently, see https://github.com/RoboCup-SSL/grSim/issues/183
-#  build-windows:
-#    runs-on: windows-latest
-#    steps:
-#      - uses: actions/checkout@v4
-#
-#      - name: Install dependencies # saves / restores cache to avoid rebuilding dependencies
-#        uses: lukka/run-vcpkg@v11
-#        with:
-#          vcpkgGitCommitId: 8eb57355a4ffb410a2e94c07b4dca2dffbee8e50
-#          vcpkgDirectory: c:/vcpkg  # folder must reside in c:\ otherwise qt wont install due to long path errors
-#
-#      - name: Run CMake and run vcpkg to build packages
-#        uses: lukka/run-cmake@v10
-#        with:
-#          # this preset is needed to actually install the vcpkg dependencies
-#          configurePreset: "ninja-multi-vcpkg"
-#          configPresetAdditionalArgs: "[-DVCPKG_TARGET_TRIPLET=x64-windows]"
-#          buildPreset: "ninja-multi-vcpkg"
-#          buildPresetAdditionalArgs: "['--config Release']"
-#    env:
-#      # [OPTIONAL] Define the vcpkg's triplet you want to enforce, otherwise the default one
-#      # for the hosting system will be automatically choosen (x64 is the default on all
-#      # platforms, e.g. `x64-osx`).
-#      VCPKG_DEFAULT_TRIPLET: "x64-windows"
+  build-windows:
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: lukka/get-cmake@latest
+
+      - name: Setup MSVC dev environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Cache Qt5
+        id: cache-qt
+        uses: actions/cache@v4
+        with:
+          path: C:/Qt
+          key: qt-5.15.2-win64-msvc2019-64
+
+      - name: Install Qt5 via aqtinstall
+        if: steps.cache-qt.outputs.cache-hit != 'true'
+        run: |
+          pip install aqtinstall
+          python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 --outputdir C:/Qt
+
+      - name: Configure
+        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_ODE=ON "-DCMAKE_PREFIX_PATH=C:/Qt/5.15.2/msvc2019_64"
+
+      - name: Build
+        run: cmake --build build --config Release
