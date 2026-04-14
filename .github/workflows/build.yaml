@@ -53,10 +53,15 @@ jobs:
 
       - uses: lukka/get-cmake@latest
 
+      - name: Setup MSVC dev environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
       - name: Install dependencies via vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
+          vcpkgGitCommitId: 'c3867e714dd3a51c272826eea77267876517ed99'
           vcpkgDirectory: 'c:/vcpkg'
 
       - name: Configure and Build with CMake
