@@ -36,6 +36,10 @@ add_executable(${app} "")
 # definitions for knowing the OS from the code
 if(MSVC)
     add_definitions(-DHAVE_MSVC)
+    # M_PI and other POSIX math constants are not defined by default on MSVC
+    add_definitions(-D_USE_MATH_DEFINES)
+    # Prevent windows.h from defining min/max macros that conflict with std::min/std::max
+    add_definitions(-DNOMINMAX)
 endif()
 if(WIN32)
     add_definitions(-DHAVE_WINDOWS)
