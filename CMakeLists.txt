@@ -36,6 +36,10 @@ add_executable(${app} "")
 # definitions for knowing the OS from the code
 if(MSVC)
     add_definitions(-DHAVE_MSVC)
+    # M_PI and other POSIX math constants are not defined by default on MSVC
+    add_definitions(-D_USE_MATH_DEFINES)
+    # Prevent windows.h from defining min/max macros that conflict with std::min/std::max
+    add_definitions(-DNOMINMAX)
 endif()
 if(WIN32)
     add_definitions(-DHAVE_WINDOWS)
@@ -51,7 +55,8 @@ if(UNIX)
 endif()
 
 # set explicitly the c++ standard to use
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # add src dir to included directories
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -112,6 +117,18 @@ if(NOT VARTYPES_FOUND)
   set(VARTYPES_CMAKE_ARGS "-DVARTYPES_BUILD_STATIC=ON;-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>;-DCMAKE_POLICY_VERSION_MINIMUM=3.5")
   if(NOT "${CMAKE_TOOLCHAIN_FILE}" STREQUAL "")
     set(VARTYPES_CMAKE_ARGS "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE};${VARTYPES_CMAKE_ARGS}")
+  endif()
+  if(CMAKE_C_COMPILER)
+    list(APPEND VARTYPES_CMAKE_ARGS "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+  endif()
+  if(CMAKE_CXX_COMPILER)
+    list(APPEND VARTYPES_CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+  endif()
+  if(CMAKE_MAKE_PROGRAM)
+    list(APPEND VARTYPES_CMAKE_ARGS "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}")
+  endif()
+  if(CMAKE_PREFIX_PATH)
+    list(APPEND VARTYPES_CMAKE_ARGS "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
   endif()
 
   ExternalProject_Add(vartypes_external

@@ -23,10 +23,10 @@ include(ExternalProject)
 set(PROTOBUF_CMAKE_ARGS )
 
 ExternalProject_Add(protobuf_external
-                    # URL is the same as in the ER-Force framework,
-                    # because ER-Force needs it and has an incentive to keep the link stable
-  URL               http://www.robotics-erlangen.de/downloads/libraries/protobuf-cpp-3.6.1.tar.gz
-  URL_HASH          SHA256=b3732e471a9bb7950f090fd0457ebd2536a9ba0891b7f3785919c654fe2a2529
+                    # Protobuf 3.20.3: last 3.x version compatible with the project (< 3.21)
+                    # and compatible with MSVC 2022 (>= 3.13 required for hash_compare removal)
+  URL               https://github.com/protocolbuffers/protobuf/releases/download/v3.20.3/protobuf-cpp-3.20.3.tar.gz
+  URL_HASH          SHA256=e51cc8fc496f893e2a48beb417730ab6cbcb251142ad8b2cd1951faa5c76fe3d
   SOURCE_SUBDIR     cmake
   CMAKE_ARGS
                     -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
@@ -40,8 +40,13 @@ ExternalProject_Add(protobuf_external
   STEP_TARGETS install
 )
 
-set(PROTOBUF_SUBPATH "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}protobuf${CMAKE_STATIC_LIBRARY_SUFFIX}")
-set(LIBPROTOC_SUBPATH "${CMAKE_INSTALL_LIBDIR}/${CMAKE_STATIC_LIBRARY_PREFIX}protoc${CMAKE_STATIC_LIBRARY_SUFFIX}")
+# protobuf's CMake targets are named "libprotobuf" and "libprotoc", so the
+# installed filenames are "libprotobuf.a" / "libprotoc.a" on Unix and
+# "libprotobuf.lib" / "libprotoc.lib" on MSVC.  Using the target-name prefix
+# ("lib") directly instead of CMAKE_STATIC_LIBRARY_PREFIX keeps the paths
+# correct on every platform.
+set(PROTOBUF_SUBPATH "${CMAKE_INSTALL_LIBDIR}/libprotobuf${CMAKE_STATIC_LIBRARY_SUFFIX}")
+set(LIBPROTOC_SUBPATH "${CMAKE_INSTALL_LIBDIR}/libprotoc${CMAKE_STATIC_LIBRARY_SUFFIX}")
 set(PROTOC_SUBPATH "bin/protoc${CMAKE_EXECUTABLE_SUFFIX}")
 
 # the byproducts are available after the install step
@@ -59,7 +64,7 @@ set_target_properties(protobuf_external PROPERTIES EXCLUDE_FROM_ALL true)
 # override all necessary variables originally set by find_package
 # if FORCE is not set cmake does not allow us to override the variables, for some unknown reason
 set(Protobuf_FOUND true CACHE BOOL "" FORCE)
-set(Protobuf_VERSION "3.6.1" CACHE STRING "" FORCE)
+set(Protobuf_VERSION "3.20.3" CACHE STRING "" FORCE)
 set(Protobuf_INCLUDE_DIR "${install_dir}/include" CACHE PATH "" FORCE)
 set(Protobuf_INCLUDE_DIRS "${Protobuf_INCLUDE_DIR}" CACHE PATH "" FORCE)
 set(Protobuf_LIBRARY "${install_dir}/${PROTOBUF_SUBPATH}" CACHE PATH "" FORCE)
