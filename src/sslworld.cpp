@@ -132,7 +132,7 @@ bool ballCallBack(dGeomID o1,dGeomID o2,PSurface* s, int /*robots_count*/)
     return true;
 }
 
-SSLWorld::SSLWorld(QGLWidget* parent, ConfigWidget* _cfg, RobotsFormation *form1, RobotsFormation *form2) : QObject(parent) {
+SSLWorld::SSLWorld(QOpenGLWidget* parent, ConfigWidget* _cfg, RobotsFormation *form1, RobotsFormation *form2) : QObject(parent) {
     isGLEnabled = true;
     customDT = -1;    
     _w = this;

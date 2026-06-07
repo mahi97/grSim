@@ -39,7 +39,7 @@ const dReal sky_scale    = 1.0f;    // sky texture scale (1/size)
 const dReal sky_height   = 1.0f;    // sky height above viewpoint
 
 
-CGraphics::CGraphics(QGLWidget* _owner)
+CGraphics::CGraphics(QOpenGLWidget* _owner)
 {
     owner = _owner;
     dReal xyz[3] = {0.8317f,-0.9817f,0.8000f};
@@ -78,7 +78,12 @@ int CGraphics::loadTexture(QImage* img)
     GLuint id;
     glEnable(GL_TEXTURE_2D);
     glGenTextures(1, &id);
-    id = owner->bindTexture(*img);
+    glBindTexture(GL_TEXTURE_2D, id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    QImage glImg = img->convertToFormat(QImage::Format_RGBA8888).mirrored();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, glImg.width(), glImg.height(), 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, glImg.constBits());
 
     tex_ids.append(id);
     return tex_ids.size()-1;

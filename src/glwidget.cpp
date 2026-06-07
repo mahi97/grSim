@@ -17,6 +17,7 @@ Copyright (C) 2011, Parsian Robotic Center (eew.aut.ac.ir/~parsian/grsim)
 */
 #include "config.h"
 #include <QtGui>
+#include <QOpenGLFunctions>
 
 #include <QPainter>
 #include "glwidget.h"
@@ -28,7 +29,7 @@ Copyright (C) 2011, Parsian Robotic Center (eew.aut.ac.ir/~parsian/grsim)
 #include <iostream>
 
 GLWidget::GLWidget(QWidget *parent, ConfigWidget* _cfg)
-    : QGLWidget(parent)
+    : QOpenGLWidget(parent)
 {
     frames = 0;
     state = CursorMode::STEADY;
@@ -263,21 +264,21 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
             if (ssl->robots[ssl->selected]->on)
                 onOffRobotAct->setText("Turn &off");
             else onOffRobotAct->setText("Turn &on");
-            robpopup->exec(event->globalPos());
+            robpopup->exec(event->globalPosition().toPoint());
         }
         else clicked_robot=-1;
         if (ssl->selected==-2)
-            ballpopup->exec(event->globalPos());
+            ballpopup->exec(event->globalPosition().toPoint());
         if (ssl->selected==-1)
-            mainpopup->exec(event->globalPos());
+            mainpopup->exec(event->globalPosition().toPoint());
     }
 }
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
     if (!ssl->g->isGraphicsEnabled()) return;
-    ssl->g->zoomCamera(-event->delta()*0.002);
-    update3DCursor(event->x(),event->y());
+    ssl->g->zoomCamera(-event->angleDelta().y()*0.002);
+    update3DCursor(event->position().x(),event->position().y());
 }
 
 void GLWidget::update3DCursor(int mouse_x,int mouse_y)
@@ -309,20 +310,20 @@ void GLWidget::update3DCursor(int mouse_x,int mouse_y)
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if (!ssl->g->isGraphicsEnabled()) return;
-    int dx = -(event->x() - lastPos.x());
-    int dy = -(event->y() - lastPos.y());    
+    int dx = -(event->position().x() - lastPos.x());
+    int dy = -(event->position().y() - lastPos.y());    
     if (event->buttons() & Qt::LeftButton) {
         if (ctrl)
             ssl->g->cameraMotion(CameraMotionMode::MOVE_POSITION_FREELY,dx,dy);
         else
             ssl->g->cameraMotion(CameraMotionMode::ROTATE_VIEW_POINT,dx,dy);
     }
-    else if (event->buttons() & Qt::MidButton)
+    else if (event->buttons() & Qt::MiddleButton)
     {
         ssl->g->cameraMotion(CameraMotionMode::MOVE_POSITION_LR,dx,dy);
     }
     lastPos = event->pos();
-    update3DCursor(event->x(),event->y());
+    update3DCursor(event->position().x(),event->position().y());
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent * /* event */)
@@ -390,20 +391,9 @@ void GLWidget::paintGL()
         ssl->g->lookAt(x,y,z);
     }
     step();    
-    QFont font;
     for (int i=0;i< cfg->Robots_Count()*2;i++)
     {
-        dReal xx,yy;
-        ssl->robots[i]->getXY(xx,yy);
-        if (i>=cfg->Robots_Count()) qglColor(Qt::yellow);
-        else qglColor(Qt::cyan);
-        renderText(xx,yy,0.3,QString::number(i%cfg->Robots_Count()),font);
-        if (!ssl->robots[i]->on){
-            qglColor(Qt::red);
-            font.setBold(true);
-            renderText(xx,yy,0.4,"Off",font);
-        }
-        font.setBold(false);
+        ssl->robots[i]->drawLabel();
     }
 }
 
